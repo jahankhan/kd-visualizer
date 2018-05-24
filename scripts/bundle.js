@@ -98,13 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
     [5,7,1],
     [5,6,3]
   ];
-  const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](new _kd_node__WEBPACK_IMPORTED_MODULE_1__["default"]([3,7,1]));
-  tree.buildTree(pointList);
+  console.log(pointList);
+
+  const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  tree.buildOptimalTree(pointList);
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
-  // debugger
-  // inorderTraversal(tree.root);
-
+  // console.log(findAxisMedian(pointList, 0));
 });
 
 
@@ -165,10 +165,12 @@ class KDNode {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 class KDTree {
-  constructor(root) {
+  constructor(root = null) {
     this.root = root;
   }
 
@@ -179,7 +181,36 @@ class KDTree {
     });
   }
 
+  setRoot(point) {
+    this.root = new _kd_node__WEBPACK_IMPORTED_MODULE_0__["default"](point);
+  }
+
+  buildOptimalTree(pointList, dim = 0) {
+    if(pointList.length === 0) {
+      return pointList;
+    }
+    const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["sortByDimension"])(pointList, dim);
+    let pivot;
+    let mid;
+    if (pointList.length % 2 === 0) {
+      mid = (pointList.length/2)-1;
+      pivot = pointList[mid];
+    } else {
+      mid = Math.floor(pointList.length/2);
+      pivot = pointList[mid];
+    }
+    console.log(pivot);
+    this.assignPoint(pivot, this.root);
+    const leftPointList = sortedList.slice(0, mid);
+    const rightPointList = sortedList.slice(mid+1);
+    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim));
+    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim));
+  }
+
   assignPoint(point, node) {
+    if (!node) {
+      return this.setRoot(point);
+    }
     if(point[node.dim] < node.data[node.dim]) {
       if(node.leftChild === null){
         node.addLeftChild(new _kd_node__WEBPACK_IMPORTED_MODULE_0__["default"](point));
@@ -206,12 +237,14 @@ class KDTree {
 /*!******************************!*\
   !*** ./scripts/tree_util.js ***!
   \******************************/
-/*! exports provided: inorderTraversal */
+/*! exports provided: inorderTraversal, sortByDimension, getNextDim */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "inorderTraversal", function() { return inorderTraversal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortByDimension", function() { return sortByDimension; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNextDim", function() { return getNextDim; });
 const inorderTraversal = root => {
 
   if(root.leftChild !== null) {
@@ -222,6 +255,27 @@ const inorderTraversal = root => {
     inorderTraversal(root.rightChild);
   }
   return;
+};
+
+const sortByDimension = (list, dim) => {
+  return list.sort((pointA, pointB) => {
+    if(pointA[dim] < pointB[dim]) {
+      return -1;
+    } else if (pointA[dim] === pointB[dim]) {
+      return 0;
+    } else {
+      return 1;
+    }
+  });
+  // if (list.length % 2 === 0) {
+  //   return list[(list.length/2)-1];
+  // } else {
+  //   return list[Math.floor(list.length/2)];
+  // }
+};
+
+const getNextDim = dim => {
+  return (dim + 1) % 3;
 };
 
 
@@ -257,14 +311,12 @@ const Y_OFFSET = 50;
 class TreeVis {
   constructor(tree) {
     this.tree = tree;
+    this.ctx = document.getElementById("treeCanvas").getContext("2d");
   }
 
   drawTree(node) {
-    const canvas = document.getElementById("treeCanvas");
-    const ctx = canvas.getContext("2d");
-    // let node = this.tree.root;
     if(node) {
-      this.drawNode(node, ctx);
+      this.drawNode(node);
       if(node.leftChild) {
         this.drawTree(node.leftChild);
       }
@@ -275,33 +327,31 @@ class TreeVis {
     return ;
   }
 
-
-
-  drawNode(node, ctx) {
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, NODE_RADIUS, 0, FULL_CIRCLE, true);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#f7b983";
-    ctx.fill();
-    ctx.fillStyle = "#050200";
-    ctx.fillText(node.data.join(','), node.x, node.y);
-    ctx.stroke();
-    this.drawChildrenPath(node, ctx);
+  drawNode(node) {
+    this.ctx.beginPath();
+    this.ctx.arc(node.x, node.y, NODE_RADIUS, 0, FULL_CIRCLE, true);
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillStyle = "#f7b983";
+    this.ctx.fill();
+    this.ctx.fillStyle = "#050200";
+    this.ctx.fillText(node.data.join(','), node.x, node.y);
+    this.ctx.stroke();
+    this.drawChildrenPath(node, this.ctx);
   }
 
-  drawChildrenPath(node, ctx) {
+  drawChildrenPath(node) {
     if(node.leftChild !== null) {
-      ctx.beginPath();
-      ctx.moveTo(node.x + LEFT_START, node.y + Y_START);
-      ctx.lineTo(node.x+ LEFT_OFFSET, node.y + Y_OFFSET);
-      ctx.stroke();
+      this.ctx.beginPath();
+      this.ctx.moveTo(node.x + LEFT_START, node.y + Y_START);
+      this.ctx.lineTo(node.x+ LEFT_OFFSET, node.y + Y_OFFSET);
+      this.ctx.stroke();
     }
     if(node.rightChild !== null) {
-      ctx.beginPath();
-      ctx.moveTo(node.x+ RIGHT_START, node.y + Y_START);
-      ctx.lineTo(node.x+ RIGHT_OFFSET, node.y + Y_OFFSET);
-      ctx.stroke();
+      this.ctx.beginPath();
+      this.ctx.moveTo(node.x+ RIGHT_START, node.y + Y_START);
+      this.ctx.lineTo(node.x+ RIGHT_OFFSET, node.y + Y_OFFSET);
+      this.ctx.stroke();
     }
   }
 }

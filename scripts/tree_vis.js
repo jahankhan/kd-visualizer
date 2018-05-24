@@ -11,14 +11,12 @@ export const Y_OFFSET = 50;
 class TreeVis {
   constructor(tree) {
     this.tree = tree;
+    this.ctx = document.getElementById("treeCanvas").getContext("2d");
   }
 
   drawTree(node) {
-    const canvas = document.getElementById("treeCanvas");
-    const ctx = canvas.getContext("2d");
-    // let node = this.tree.root;
     if(node) {
-      this.drawNode(node, ctx);
+      this.drawNode(node);
       if(node.leftChild) {
         this.drawTree(node.leftChild);
       }
@@ -29,33 +27,31 @@ class TreeVis {
     return ;
   }
 
-
-
-  drawNode(node, ctx) {
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, NODE_RADIUS, 0, FULL_CIRCLE, true);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#f7b983";
-    ctx.fill();
-    ctx.fillStyle = "#050200";
-    ctx.fillText(node.data.join(','), node.x, node.y);
-    ctx.stroke();
-    this.drawChildrenPath(node, ctx);
+  drawNode(node) {
+    this.ctx.beginPath();
+    this.ctx.arc(node.x, node.y, NODE_RADIUS, 0, FULL_CIRCLE, true);
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillStyle = "#f7b983";
+    this.ctx.fill();
+    this.ctx.fillStyle = "#050200";
+    this.ctx.fillText(node.data.join(','), node.x, node.y);
+    this.ctx.stroke();
+    this.drawChildrenPath(node, this.ctx);
   }
 
-  drawChildrenPath(node, ctx) {
+  drawChildrenPath(node) {
     if(node.leftChild !== null) {
-      ctx.beginPath();
-      ctx.moveTo(node.x + LEFT_START, node.y + Y_START);
-      ctx.lineTo(node.x+ LEFT_OFFSET, node.y + Y_OFFSET);
-      ctx.stroke();
+      this.ctx.beginPath();
+      this.ctx.moveTo(node.x + LEFT_START, node.y + Y_START);
+      this.ctx.lineTo(node.x+ LEFT_OFFSET, node.y + Y_OFFSET);
+      this.ctx.stroke();
     }
     if(node.rightChild !== null) {
-      ctx.beginPath();
-      ctx.moveTo(node.x+ RIGHT_START, node.y + Y_START);
-      ctx.lineTo(node.x+ RIGHT_OFFSET, node.y + Y_OFFSET);
-      ctx.stroke();
+      this.ctx.beginPath();
+      this.ctx.moveTo(node.x+ RIGHT_START, node.y + Y_START);
+      this.ctx.lineTo(node.x+ RIGHT_OFFSET, node.y + Y_OFFSET);
+      this.ctx.stroke();
     }
   }
 }
