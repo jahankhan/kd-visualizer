@@ -6,7 +6,8 @@ export const Y_START = (NODE_RADIUS/Math.sqrt(2));
 export const LEFT_OFFSET = -40;
 export const RIGHT_OFFSET = 40;
 export const Y_OFFSET = 50;
-
+export const X = 600;
+export const Y = 600;
 
 class TreeVis {
   constructor(tree) {

@@ -1,9 +1,10 @@
 import KDTree from './kd_tree';
 import KDNode from './kd_node';
 import TreeVis from './tree_vis';
+import TwoDVis from './two_d_vis';
 import { inorderTraversal, findAxisMedian } from './tree_util';
 document.addEventListener('DOMContentLoaded', () => {
-  const pointList = [
+  const threedPointList = [
     [8,1,1],
     [6,6,2],
     [2,6,4],
@@ -12,11 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     [5,7,1],
     [5,6,3]
   ];
+
+  const twodPointList = [
+    [8,1],
+    [6,6],
+    [2,6],
+    // [2,7],
+    // [9,8],
+    // [5,7],
+    // [5,6]
+  ];
   // console.log(pointList);
 
-  const tree = new KDTree();
-  tree.buildOptimalTree(pointList);
+  const tree = new KDTree(null, 2);
+  tree.buildOptimalTree(twodPointList);
+  console.log(tree);
   const treeVis = new TreeVis(tree);
   treeVis.drawTree(tree.root);
-  // console.log(findAxisMedian(pointList, 0));
+  const twoDVis = new TwoDVis(tree);
+  twoDVis.drawVis(tree.root);
 });

@@ -27,6 +27,6 @@ export const sortByDimension = (list, dim) => {
   // }
 };
 
-export const getNextDim = dim => {
-  return (dim + 1) % 3;
+export const getNextDim = (dim, totalDims) => {
+  return (dim + 1) % totalDims;
 };

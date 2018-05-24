@@ -83,13 +83,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_tree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./kd_tree */ "./scripts/kd_tree.js");
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
 /* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _two_d_vis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./two_d_vis */ "./scripts/two_d_vis.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const pointList = [
+  const threedPointList = [
     [8,1,1],
     [6,6,2],
     [2,6,4],
@@ -98,13 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
     [5,7,1],
     [5,6,3]
   ];
+
+  const twodPointList = [
+    [8,1],
+    [6,6],
+    [2,6],
+    // [2,7],
+    // [9,8],
+    // [5,7],
+    // [5,6]
+  ];
   // console.log(pointList);
 
-  const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"]();
-  tree.buildOptimalTree(pointList);
+  const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](null, 2);
+  tree.buildOptimalTree(twodPointList);
+  console.log(tree);
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
-  // console.log(findAxisMedian(pointList, 0));
+  const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);
+  twoDVis.drawVis(tree.root);
 });
 
 
@@ -136,7 +150,7 @@ class KDNode {
   addLeftChild(node) {
     this.leftChild = node;
     node.parent = this;
-    node.dim = (this.dim + 1) % 3;
+    node.dim = (this.dim + 1) % 2;
     node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["LEFT_OFFSET"];
     node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
   }
@@ -144,7 +158,7 @@ class KDNode {
   addRightChild(node) {
     this.rightChild = node;
     node.parent = this;
-    node.dim = (this.dim + 1) % 3;
+    node.dim = (this.dim + 1) % 2;
     node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["RIGHT_OFFSET"];
     node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
   }
@@ -170,14 +184,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class KDTree {
-  constructor(root = null) {
+  constructor(root = null, dims) {
     this.root = root;
+    this.dims = dims;
   }
 
   buildTree(pointList) {
     pointList.forEach((point) => {
       this.assignPoint(point, this.root);
-      // debugger
     });
   }
 
@@ -205,8 +219,8 @@ class KDTree {
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
-    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim));
-    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim));
+    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim, this.dims));
+    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim, this.dims));
   }
 
   assignPoint(point, node) {
@@ -276,8 +290,8 @@ const sortByDimension = (list, dim) => {
   // }
 };
 
-const getNextDim = dim => {
-  return (dim + 1) % 3;
+const getNextDim = (dim, totalDims) => {
+  return (dim + 1) % totalDims;
 };
 
 
@@ -287,7 +301,7 @@ const getNextDim = dim => {
 /*!*****************************!*\
   !*** ./scripts/tree_vis.js ***!
   \*****************************/
-/*! exports provided: NODE_RADIUS, FULL_CIRCLE, LEFT_START, RIGHT_START, Y_START, LEFT_OFFSET, RIGHT_OFFSET, Y_OFFSET, default */
+/*! exports provided: NODE_RADIUS, FULL_CIRCLE, LEFT_START, RIGHT_START, Y_START, LEFT_OFFSET, RIGHT_OFFSET, Y_OFFSET, X, Y, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -300,6 +314,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LEFT_OFFSET", function() { return LEFT_OFFSET; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RIGHT_OFFSET", function() { return RIGHT_OFFSET; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Y_OFFSET", function() { return Y_OFFSET; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "X", function() { return X; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Y", function() { return Y; });
 const NODE_RADIUS = 25;
 const FULL_CIRCLE = Math.PI * 2;
 const LEFT_START = -(NODE_RADIUS/Math.sqrt(2));
@@ -308,7 +324,8 @@ const Y_START = (NODE_RADIUS/Math.sqrt(2));
 const LEFT_OFFSET = -40;
 const RIGHT_OFFSET = 40;
 const Y_OFFSET = 50;
-
+const X = 600;
+const Y = 600;
 
 class TreeVis {
   constructor(tree) {
@@ -359,6 +376,76 @@ class TreeVis {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (TreeVis);
+
+
+/***/ }),
+
+/***/ "./scripts/two_d_vis.js":
+/*!******************************!*\
+  !*** ./scripts/two_d_vis.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+
+
+class TwoDVis {
+  constructor(tree) {
+    this.tree = tree;
+    this.ctx = document.getElementById("2DCanvas").getContext("2d");
+    this.ctx.beginPath();
+    this.ctx.strokeRect(0, 0, 600, 600);
+  }
+
+  drawPoint(node) {
+    this.ctx.beginPath();
+    // console.log(600-node.data[0]*60);
+    // console.log(600 - node.data[1]*60);
+    this.ctx.arc(600-node.data[0]*60, 600 - node.data[1]*60, 4, 0, _tree_vis__WEBPACK_IMPORTED_MODULE_0__["FULL_CIRCLE"], true);
+    this.ctx.fill();
+  }
+
+  drawPartition(node) {
+    this.ctx.beginPath();
+    if (node.dim === 0) {
+      this.ctx.moveTo(600 - node.data[0]*60, 0);
+      if(node.parent) {
+        this.ctx.lineTo(600 - node.data[0]*60, node.parent.data[1]);
+      } else {
+        this.ctx.lineTo(600 - node.data[0]*60, 600);
+      }
+
+    } else {
+      if(node.parent.rightChild === node) {
+        this.ctx.moveTo(0, 600 - node.data[1]*60);
+        this.ctx.lineTo(600 - node.parent.data[0]*60, 600 - node.data[1]*60);
+      } else {
+        this.ctx.moveTo(600, 600 - node.data[1]*60);
+        this.ctx.lineTo(600 - node.parent.data[0]*60, 600 - node.data[1]*60);
+      }
+
+    }
+    this.ctx.stroke();
+  }
+
+  drawVis(node) {
+    if(node) {
+      this.drawPoint(node);
+      this.drawPartition(node);
+      if(node.leftChild) {
+        this.drawVis(node.leftChild);
+      }
+      if (node.rightChild) {
+        this.drawVis(node.rightChild);
+      }
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (TwoDVis);
 
 
 /***/ })

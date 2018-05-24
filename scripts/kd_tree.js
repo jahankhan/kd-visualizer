@@ -2,14 +2,14 @@ import KDNode from './kd_node';
 import { sortByDimension, getNextDim } from './tree_util';
 
 class KDTree {
-  constructor(root = null) {
+  constructor(root = null, dims) {
     this.root = root;
+    this.dims = dims;
   }
 
   buildTree(pointList) {
     pointList.forEach((point) => {
       this.assignPoint(point, this.root);
-      // debugger
     });
   }
 
@@ -37,8 +37,8 @@ class KDTree {
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
-    this.buildOptimalTree(leftPointList, getNextDim(dim));
-    this.buildOptimalTree(rightPointList, getNextDim(dim));
+    this.buildOptimalTree(leftPointList, getNextDim(dim, this.dims));
+    this.buildOptimalTree(rightPointList, getNextDim(dim, this.dims));
   }
 
   assignPoint(point, node) {

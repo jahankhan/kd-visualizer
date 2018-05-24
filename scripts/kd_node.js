@@ -14,7 +14,7 @@ class KDNode {
   addLeftChild(node) {
     this.leftChild = node;
     node.parent = this;
-    node.dim = (this.dim + 1) % 3;
+    node.dim = (this.dim + 1) % 2;
     node.x = node.parent.x + LEFT_OFFSET;
     node.y = node.parent.y + Y_OFFSET;
   }
@@ -22,7 +22,7 @@ class KDNode {
   addRightChild(node) {
     this.rightChild = node;
     node.parent = this;
-    node.dim = (this.dim + 1) % 3;
+    node.dim = (this.dim + 1) % 2;
     node.x = node.parent.x + RIGHT_OFFSET;
     node.y = node.parent.y + Y_OFFSET;
   }
