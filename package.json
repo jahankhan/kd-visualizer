@@ -1,0 +1,32 @@
+{
+  "name": "kd-visualizer",
+  "version": "1.0.0",
+  "description": "We know many ways to search one and two dimensional ranges to get inclusive points and nearest neighbors. This problem gets a bit harder when trying to visualize in three or more dimensions as a regular binary search tree or array will not suffice. Creating a K-d tree is great way of efficiently searching for k-dimensional ranges without the need for extra data structures.",
+  "main": "webpack.config.js",
+  "engines": {
+    "node": "8.9.4",
+    "npm": "6.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack --mode=development --watch",
+    "postinstall": "webpack --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jahankhan/kd-visualizer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jahankhan/kd-visualizer/issues"
+  },
+  "homepage": "https://github.com/jahankhan/kd-visualizer#readme",
+  "dependencies": {
+    "webpack": "^4.8.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.1.3"
+  }
+}
