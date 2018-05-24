@@ -82,7 +82,9 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_tree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./kd_tree */ "./scripts/kd_tree.js");
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -98,8 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](new _kd_node__WEBPACK_IMPORTED_MODULE_1__["default"]([3,7,1]));
   tree.buildTree(pointList);
+  const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
+  treeVis.drawTree(tree.root);
   // debugger
-  Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["inorderTraversal"])(tree.root);
+  // inorderTraversal(tree.root);
 
 });
 
@@ -115,6 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+
+
 class KDNode {
   constructor(data, parent = null, leftChild = null, rightChild = null, dim = 0) {
     this.data = data;
@@ -122,18 +129,24 @@ class KDNode {
     this.leftChild = leftChild;
     this.rightChild = rightChild;
     this.dim = dim;
+    this.x = 150;
+    this.y = 100;
   }
 
   addLeftChild(node) {
     this.leftChild = node;
     node.parent = this;
     node.dim = (this.dim + 1) % 3;
+    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["LEFT_OFFSET"];
+    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
   }
 
   addRightChild(node) {
     this.rightChild = node;
     node.parent = this;
     node.dim = (this.dim + 1) % 3;
+    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["RIGHT_OFFSET"];
+    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
   }
 }
 
@@ -210,6 +223,90 @@ const inorderTraversal = root => {
   }
   return;
 };
+
+
+/***/ }),
+
+/***/ "./scripts/tree_vis.js":
+/*!*****************************!*\
+  !*** ./scripts/tree_vis.js ***!
+  \*****************************/
+/*! exports provided: NODE_RADIUS, FULL_CIRCLE, LEFT_START, RIGHT_START, Y_START, LEFT_OFFSET, RIGHT_OFFSET, Y_OFFSET, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NODE_RADIUS", function() { return NODE_RADIUS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FULL_CIRCLE", function() { return FULL_CIRCLE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LEFT_START", function() { return LEFT_START; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RIGHT_START", function() { return RIGHT_START; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Y_START", function() { return Y_START; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LEFT_OFFSET", function() { return LEFT_OFFSET; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RIGHT_OFFSET", function() { return RIGHT_OFFSET; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Y_OFFSET", function() { return Y_OFFSET; });
+const NODE_RADIUS = 25;
+const FULL_CIRCLE = Math.PI * 2;
+const LEFT_START = -(NODE_RADIUS/Math.sqrt(2));
+const RIGHT_START = (NODE_RADIUS/Math.sqrt(2));
+const Y_START = (NODE_RADIUS/Math.sqrt(2));
+const LEFT_OFFSET = -40;
+const RIGHT_OFFSET = 40;
+const Y_OFFSET = 50;
+
+
+class TreeVis {
+  constructor(tree) {
+    this.tree = tree;
+  }
+
+  drawTree(node) {
+    const canvas = document.getElementById("treeCanvas");
+    const ctx = canvas.getContext("2d");
+    // let node = this.tree.root;
+    if(node) {
+      this.drawNode(node, ctx);
+      if(node.leftChild) {
+        this.drawTree(node.leftChild);
+      }
+      if (node.rightChild) {
+        this.drawTree(node.rightChild);
+      }
+    }
+    return ;
+  }
+
+
+
+  drawNode(node, ctx) {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, NODE_RADIUS, 0, FULL_CIRCLE, true);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#f7b983";
+    ctx.fill();
+    ctx.fillStyle = "#050200";
+    ctx.fillText(node.data.join(','), node.x, node.y);
+    ctx.stroke();
+    this.drawChildrenPath(node, ctx);
+  }
+
+  drawChildrenPath(node, ctx) {
+    if(node.leftChild !== null) {
+      ctx.beginPath();
+      ctx.moveTo(node.x + LEFT_START, node.y + Y_START);
+      ctx.lineTo(node.x+ LEFT_OFFSET, node.y + Y_OFFSET);
+      ctx.stroke();
+    }
+    if(node.rightChild !== null) {
+      ctx.beginPath();
+      ctx.moveTo(node.x+ RIGHT_START, node.y + Y_START);
+      ctx.lineTo(node.x+ RIGHT_OFFSET, node.y + Y_OFFSET);
+      ctx.stroke();
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (TreeVis);
 
 
 /***/ })

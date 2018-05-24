@@ -1,5 +1,6 @@
 import KDTree from './kd_tree';
 import KDNode from './kd_node';
+import TreeVis from './tree_vis';
 import { inorderTraversal } from './tree_util';
 document.addEventListener('DOMContentLoaded', () => {
   const pointList = [
@@ -13,7 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const tree = new KDTree(new KDNode([3,7,1]));
   tree.buildTree(pointList);
+  const treeVis = new TreeVis(tree);
+  treeVis.drawTree(tree.root);
   // debugger
-  inorderTraversal(tree.root);
+  // inorderTraversal(tree.root);
 
 });
