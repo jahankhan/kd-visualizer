@@ -21,7 +21,9 @@ class KDTree {
     if(pointList.length === 0) {
       return pointList;
     }
+    console.log(pointList);
     const sortedList = sortByDimension(pointList, dim);
+
     let pivot;
     let mid;
     if (pointList.length % 2 === 0) {
@@ -31,7 +33,7 @@ class KDTree {
       mid = Math.floor(pointList.length/2);
       pivot = pointList[mid];
     }
-    console.log(pivot);
+    // console.log(pivot);
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
@@ -43,7 +45,7 @@ class KDTree {
     if (!node) {
       return this.setRoot(point);
     }
-    if(point[node.dim] < node.data[node.dim]) {
+    if(point[node.dim] <= node.data[node.dim]) {
       if(node.leftChild === null){
         node.addLeftChild(new KDNode(point));
       } else {

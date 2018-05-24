@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [5,7,1],
     [5,6,3]
   ];
-  console.log(pointList);
+  // console.log(pointList);
 
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"]();
   tree.buildOptimalTree(pointList);
@@ -189,7 +189,9 @@ class KDTree {
     if(pointList.length === 0) {
       return pointList;
     }
+    console.log(pointList);
     const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["sortByDimension"])(pointList, dim);
+
     let pivot;
     let mid;
     if (pointList.length % 2 === 0) {
@@ -199,7 +201,7 @@ class KDTree {
       mid = Math.floor(pointList.length/2);
       pivot = pointList[mid];
     }
-    console.log(pivot);
+    // console.log(pivot);
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
@@ -211,7 +213,7 @@ class KDTree {
     if (!node) {
       return this.setRoot(point);
     }
-    if(point[node.dim] < node.data[node.dim]) {
+    if(point[node.dim] <= node.data[node.dim]) {
       if(node.leftChild === null){
         node.addLeftChild(new _kd_node__WEBPACK_IMPORTED_MODULE_0__["default"](point));
       } else {

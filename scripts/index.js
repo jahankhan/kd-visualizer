@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [5,7,1],
     [5,6,3]
   ];
-  console.log(pointList);
+  // console.log(pointList);
 
   const tree = new KDTree();
   tree.buildOptimalTree(pointList);
