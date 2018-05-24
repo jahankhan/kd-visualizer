@@ -18,10 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     [8,1],
     [6,6],
     [2,6],
-    // [2,7],
-    // [9,8],
-    // [5,7],
-    // [5,6]
+    [2,7],
+    [9,8],
+    [5,7],
+    [5,6]
   ];
   // console.log(pointList);
 
