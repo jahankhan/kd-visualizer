@@ -21,7 +21,7 @@ class KDTree {
     if(pointList.length === 0) {
       return pointList;
     }
-    console.log(pointList);
+    // console.log(pointList);
     const sortedList = sortByDimension(pointList, dim);
 
     let pivot;

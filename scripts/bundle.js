@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](null, 2);
   tree.buildOptimalTree(twodPointList);
-  console.log(tree);
+  // console.log(tree);
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);
@@ -203,7 +203,7 @@ class KDTree {
     if(pointList.length === 0) {
       return pointList;
     }
-    console.log(pointList);
+    // console.log(pointList);
     const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["sortByDimension"])(pointList, dim);
 
     let pivot;
@@ -266,7 +266,7 @@ const inorderTraversal = root => {
   if(root.leftChild !== null) {
     inorderTraversal(root.leftChild);
   }
-  console.log(root);
+  // console.log(root);
   if(root.rightChild !== null) {
     inorderTraversal(root.rightChild);
   }
@@ -402,38 +402,63 @@ class TwoDVis {
 
   drawPoint(node) {
     this.ctx.beginPath();
-    // console.log(600-node.data[0]*60);
-    // console.log(600 - node.data[1]*60);
-    this.ctx.arc(600-node.data[0]*60, 600 - node.data[1]*60, 4, 0, _tree_vis__WEBPACK_IMPORTED_MODULE_0__["FULL_CIRCLE"], true);
+    this.ctx.arc(node.data[0]*60, 600 - node.data[1]*60, 4, 0, _tree_vis__WEBPACK_IMPORTED_MODULE_0__["FULL_CIRCLE"], true);
     this.ctx.fill();
   }
 
   drawPartition(node) {
-    this.ctx.beginPath();
-    if (node.dim === 0) {
-      this.ctx.moveTo(600 - node.data[0]*60, 0);
-      if(node.parent) {
-        this.ctx.lineTo(600 - node.data[0]*60, node.parent.data[1]);
-      } else {
-        this.ctx.lineTo(600 - node.data[0]*60, 600);
-      }
+    const path = this.getPathToRoot(node);
+    const { xBounds, yBounds } = this.findBoundaries(path);
+    this.ctx.strokeRect(xBounds[0], yBounds[0], xBounds[1]-xBounds[0], yBounds[1]-yBounds[0]);
+  }
 
-    } else {
-      if(node.parent.rightChild === node) {
-        this.ctx.moveTo(0, 600 - node.data[1]*60);
-        this.ctx.lineTo(600 - node.parent.data[0]*60, 600 - node.data[1]*60);
-      } else {
-        this.ctx.moveTo(600, 600 - node.data[1]*60);
-        this.ctx.lineTo(600 - node.parent.data[0]*60, 600 - node.data[1]*60);
+  getPathToRoot(node) {
+    const path = [node];
+    if(node) {
+      while(node.parent !== null) {
+        path.push(node.parent)
+        node = node.parent;
       }
-
     }
-    this.ctx.stroke();
+    return path.reverse();
+  }
+
+  findBoundaries(path) {
+    const xBounds = [0, 600];
+    const yBounds = [0, 600];
+    for(let i = 0; i < path.length; i++) {
+      if(path[i].leftChild === path[i+1]) { //left child
+        if(path[i].dim === 0) {
+          xBounds[1] = path[i].data[0] * 60;
+        } else {
+          yBounds[0] = 600 - path[i].data[1] * 60;
+        }
+      } else { //right child
+        if(path[i].dim === 0) {
+          xBounds[0] = path[i].data[0] * 60;
+        } else {
+          yBounds[1] = 600 - path[i].data[1] * 60;
+        }
+      }
+    }
+    // if(node) {
+    //   while(node.parent !== null && counter < this.tree.dims * 2) {
+    //     if(node.parent.dim === 0) {
+    //       xBounds.unshift(node.parent.data[node.parent.dim] * 60);
+    //     } else {
+    //       yBounds.unshift(600 - node.parent.data[node.parent.dim] * 60);
+    //     }
+    //     counter += 1;
+    //     node = node.parent;
+    //   }
+    // }
+    return { xBounds,yBounds };
   }
 
   drawVis(node) {
     if(node) {
       this.drawPoint(node);
+
       this.drawPartition(node);
       if(node.leftChild) {
         this.drawVis(node.leftChild);
