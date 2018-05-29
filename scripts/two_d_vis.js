@@ -6,8 +6,23 @@ class TwoDVis {
   constructor(tree) {
     this.tree = tree;
     this.ctx = document.getElementById("2DCanvas").getContext("2d");
+    this.width = 620;
+    this.height = 620;
     this.ctx.beginPath();
     this.ctx.strokeRect(0, 0, 600, 600);
+    this.drawAxis();
+  }
+
+  drawAxis() {
+    for(let i = 1; i < 11; i++) {
+      this.ctx.beginPath();
+      // this.ctx.moveTo(i*60, 610);
+      // this.ctx.stroke();
+      this.ctx.textAlign = "center";
+      this.ctx.textBaseline = "middle";
+      this.ctx.fillText(i, i*60, 610);
+      this.ctx.fillText(i, 610, 600- i*60);
+    }
   }
 
   drawPoint(node) {
@@ -51,30 +66,22 @@ class TwoDVis {
         }
       }
     }
-    // if(node) {
-    //   while(node.parent !== null && counter < this.tree.dims * 2) {
-    //     if(node.parent.dim === 0) {
-    //       xBounds.unshift(node.parent.data[node.parent.dim] * 60);
-    //     } else {
-    //       yBounds.unshift(600 - node.parent.data[node.parent.dim] * 60);
-    //     }
-    //     counter += 1;
-    //     node = node.parent;
-    //   }
-    // }
     return { xBounds,yBounds };
   }
 
   drawVis(node) {
     if(node) {
       this.drawPoint(node);
-
       this.drawPartition(node);
       if(node.leftChild) {
-        this.drawVis(node.leftChild);
+        window.setTimeout(() => {
+          this.drawVis(node.leftChild);
+        }, 2000);
       }
       if (node.rightChild) {
-        this.drawVis(node.rightChild);
+        window.setTimeout(() => {
+          this.drawVis(node.rightChild);
+        }, 3000);
       }
     }
   }

@@ -19,10 +19,14 @@ class TreeVis {
     if(node) {
       this.drawNode(node);
       if(node.leftChild) {
-        this.drawTree(node.leftChild);
+        window.setTimeout(() => {
+          this.drawTree(node.leftChild);
+        }, 2000);
       }
       if (node.rightChild) {
-        this.drawTree(node.rightChild);
+        window.setTimeout(() => {
+          this.drawTree(node.rightChild);
+        }, 3000);
       }
     }
     return ;
