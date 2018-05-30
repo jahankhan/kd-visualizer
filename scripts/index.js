@@ -2,6 +2,7 @@ import KDTree from './kd_tree';
 import KDNode from './kd_node';
 import TreeVis from './tree_vis';
 import TwoDVis from './two_d_vis';
+import { setScene } from './three_d_vis';
 import { inorderTraversal, findAxisMedian } from './tree_util';
 document.addEventListener('DOMContentLoaded', () => {
   const threedPointList = [
@@ -32,4 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   treeVis.drawTree(tree.root);
   const twoDVis = new TwoDVis(tree);
   twoDVis.drawVis(tree.root);
+  // setScene();
+  console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
 });

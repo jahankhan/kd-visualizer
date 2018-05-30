@@ -84,7 +84,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
 /* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
 /* harmony import */ var _two_d_vis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./two_d_vis */ "./scripts/two_d_vis.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _three_d_vis__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./three_d_vis */ "./scripts/three_d_vis.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -119,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
   treeVis.drawTree(tree.root);
   const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);
   twoDVis.drawVis(tree.root);
+  // setScene();
+  console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
 });
 
 
@@ -242,9 +246,73 @@ class KDTree {
       }
     }
   }
+
+  rangeSearch(node, bounds) {
+    let nodeList = [];
+    // debugger
+    if(node) {
+      if(node.data[0] >= bounds[0][0] && node.data[0] <= bounds[0][1] &&
+          node.data[1] >= bounds[1][0] && node.data[1] <= bounds[1][1]) {
+        nodeList.push(node);
+        nodeList = nodeList.concat(this.rangeSearch(node.leftChild, bounds));
+        nodeList = nodeList.concat(this.rangeSearch(node.rightChild, bounds));
+        return nodeList;
+      } else {
+        if(node.data[node.dim] > bounds[node.dim][1]) {
+          nodeList = nodeList.concat(this.rangeSearch(node.leftChild, bounds));
+          return nodeList;
+        } else if(node.data[node.dim] < bounds[node.dim][0]) {
+          nodeList = nodeList.concat(this.rangeSearch(node.rightChild, bounds));
+          return nodeList;
+        }
+      }
+    }
+    return nodeList;
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (KDTree);
+
+
+/***/ }),
+
+/***/ "./scripts/three_d_vis.js":
+/*!********************************!*\
+  !*** ./scripts/three_d_vis.js ***!
+  \********************************/
+/*! exports provided: setScene */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setScene", function() { return setScene; });
+const setScene = () => {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  document.body.appendChild( renderer.domElement );
+  const geometry = new THREE.BoxBufferGeometry( 5, 5, 1 );
+  const material = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.5 } );
+  const cube = new THREE.Mesh( geometry, material );
+  scene.add( cube );
+
+
+  var edges = new THREE.EdgesGeometry( geometry );
+  var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+  scene.add( line );
+  camera.position.z = 5;
+  function animate() {
+  	requestAnimationFrame( animate );
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+    // edges.rotation.x += .01;
+    // geometry.rotation.x += .01;
+  	renderer.render( scene, camera );
+  }
+  animate();
+}
 
 
 /***/ }),

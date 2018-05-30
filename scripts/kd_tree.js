@@ -60,6 +60,29 @@ class KDTree {
       }
     }
   }
+
+  rangeSearch(node, bounds) {
+    let nodeList = [];
+    // debugger
+    if(node) {
+      if(node.data[0] >= bounds[0][0] && node.data[0] <= bounds[0][1] &&
+          node.data[1] >= bounds[1][0] && node.data[1] <= bounds[1][1]) {
+        nodeList.push(node);
+        nodeList = nodeList.concat(this.rangeSearch(node.leftChild, bounds));
+        nodeList = nodeList.concat(this.rangeSearch(node.rightChild, bounds));
+        return nodeList;
+      } else {
+        if(node.data[node.dim] > bounds[node.dim][1]) {
+          nodeList = nodeList.concat(this.rangeSearch(node.leftChild, bounds));
+          return nodeList;
+        } else if(node.data[node.dim] < bounds[node.dim][0]) {
+          nodeList = nodeList.concat(this.rangeSearch(node.rightChild, bounds));
+          return nodeList;
+        }
+      }
+    }
+    return nodeList;
+  }
 }
 
 export default KDTree;
