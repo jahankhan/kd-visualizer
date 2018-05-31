@@ -83,6 +83,54 @@ class KDTree {
     }
     return nodeList;
   }
+
+  getPoints(node) {
+    let points = [];
+    if (node) {
+      points.push(node);
+      points = points.concat(this.getPoints(node.leftChild));
+      points = points.concat(this.getPoints(node.rightChild));
+    }
+    return points;
+  }
+
+  kNearestNeigborsNaive(queryPoint, points, k=1) {
+    const champions = [[null, 1000000]];
+
+    for(let i = 0; i < points.length; i++) {
+      let distance = Math.sqrt((queryPoint[0] - points[i].data[0])**2 + (queryPoint[1] - points[i].data[1])**2);
+      console.log(distance, points[i]);
+      if(distance < champions[0][1]) {
+        champions.shift();
+        champions.unshift([points[i], distance]);
+      }
+    }
+    return champions;
+  }
+
+  // kNearestNeigbors(queryPoint, node, champions = [], k=1) {
+  //   if (node) {
+  //     let distance = this.euclideanDistance(queryPoint, node);
+  //     if(champions.length < k) {
+  //       champions.push([node, distance]);
+  //     } else {
+  //       if(distance < champions[0][1]) {
+  //
+  //       }
+  //     }
+  //   }
+  //
+  //
+  // }
+
+  euclideanDistance(pointA, pointB) {
+    let dimValues = [];
+    for(let i = 0; i < pointA.length; i++) {
+      dimValues.push((pointA[i] - pointB[i])**2);
+    }
+    // return Math.sqrt(dimValues.reduce((acc, currVal) => acc + currVal;));
+    return 5;
+  }
 }
 
 export default KDTree;

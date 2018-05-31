@@ -71,6 +71,92 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./scripts/heap.js":
+/*!*************************!*\
+  !*** ./scripts/heap.js ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class MaxHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  leftChild(i) {
+    return (2*i) + 1;
+  }
+
+  rightChild(i) {
+    return (2*i) + 2;
+  }
+
+  parent(i) {
+    return Math.floor((i-1)/2);
+  }
+
+  peek() {
+    return this.heap[0];
+  }
+
+  insert(el) {
+    this.heap.push(el);
+    this._heapifyUp();
+  }
+
+  extract() {
+    // let result = this.heap[0];
+    let temp = this.heap[0];
+    this.heap[0] = this.heap[this.heap.length-1];
+    this.heap[this.heap.length-1] = temp;
+    let result = this.heap.pop();
+    this._heapifyDown();
+    return result;
+  }
+
+  _heapifyUp() {
+    let child = this.heap.length-1;
+    let parent = this.parent(child);
+    while(parent >= 0) {
+      if(this.heap[parent] < this.heap[child]) {
+        let temp = this.heap[child];
+        this.heap[child] = this.heap[parent];
+        this.heap[parent] = temp;
+        child = parent;
+        parent = this.parent(parent);
+      } else {
+        break;
+      }
+    }
+  }
+
+  _heapifyDown() {
+    let parent = 0;
+    let leftChild = this.leftChild(parent);
+    let rightChild = this.rightChild(parent);
+    while(rightChild <= this.heap.length-1) {
+      let child = this.heap[leftChild] >= this.heap[rightChild] ? leftChild : rightChild;
+      if(this.heap[parent] < this.heap[child]) {
+        let temp = this.heap[child];
+        this.heap[child] = this.heap[parent];
+        this.heap[parent] = temp;
+        parent = child;
+        leftChild = this.leftChild(parent);
+        rightChild = this.rightChild(parent);
+      } else {
+        break;
+      }
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (MaxHeap);
+
+
+/***/ }),
+
 /***/ "./scripts/index.js":
 /*!**************************!*\
   !*** ./scripts/index.js ***!
@@ -84,8 +170,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
 /* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
 /* harmony import */ var _two_d_vis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./two_d_vis */ "./scripts/two_d_vis.js");
-/* harmony import */ var _three_d_vis__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./three_d_vis */ "./scripts/three_d_vis.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _heap_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./heap.js */ "./scripts/heap.js");
+/* harmony import */ var _three_d_vis__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./three_d_vis */ "./scripts/three_d_vis.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -123,6 +211,15 @@ document.addEventListener('DOMContentLoaded', () => {
   twoDVis.drawVis(tree.root);
   // setScene();
   console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
+  console.log(tree.kNearestNeigborsNaive([2,5], tree.getPoints(tree.root)));
+  // const heap = new MaxHeap();
+  // heap.insert(1);
+  // heap.insert(5);
+  // heap.insert(3);
+  // heap.insert(9);
+  // heap.insert(11);
+  // heap.insert(7);
+  // heap.insert(2);
 });
 
 
@@ -268,6 +365,54 @@ class KDTree {
       }
     }
     return nodeList;
+  }
+
+  getPoints(node) {
+    let points = [];
+    if (node) {
+      points.push(node);
+      points = points.concat(this.getPoints(node.leftChild));
+      points = points.concat(this.getPoints(node.rightChild));
+    }
+    return points;
+  }
+
+  kNearestNeigborsNaive(queryPoint, points, k=1) {
+    const champions = [[null, 1000000]];
+
+    for(let i = 0; i < points.length; i++) {
+      let distance = Math.sqrt((queryPoint[0] - points[i].data[0])**2 + (queryPoint[1] - points[i].data[1])**2);
+      console.log(distance, points[i]);
+      if(distance < champions[0][1]) {
+        champions.shift();
+        champions.unshift([points[i], distance]);
+      }
+    }
+    return champions;
+  }
+
+  // kNearestNeigbors(queryPoint, node, champions = [], k=1) {
+  //   if (node) {
+  //     let distance = this.euclideanDistance(queryPoint, node);
+  //     if(champions.length < k) {
+  //       champions.push([node, distance]);
+  //     } else {
+  //       if(distance < champions[0][1]) {
+  //
+  //       }
+  //     }
+  //   }
+  //
+  //
+  // }
+
+  euclideanDistance(pointA, pointB) {
+    let dimValues = [];
+    for(let i = 0; i < pointA.length; i++) {
+      dimValues.push((pointA[i] - pointB[i])**2);
+    }
+    // return Math.sqrt(dimValues.reduce((acc, currVal) => acc + currVal;));
+    return 5;
   }
 }
 
