@@ -2,7 +2,8 @@ import KDTree from './kd_tree';
 import KDNode from './kd_node';
 import TreeVis from './tree_vis';
 import TwoDVis from './two_d_vis';
-import MaxHeap from './heap.js';
+import MaxHeap from './heap';
+import BoidVis from './boid_vis';
 import { setScene } from './three_d_vis';
 import { inorderTraversal, findAxisMedian } from './tree_util';
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,20 +24,24 @@ document.addEventListener('DOMContentLoaded', () => {
     [2,7],
     [9,8],
     [5,7],
-    [5,6]
+    [5,6],
+    [1,3],
+    [4,2],
+    [7,5],
+    [12,7],
   ];
   // console.log(pointList);
 
   const tree = new KDTree(null, 2);
   tree.buildOptimalTree(twodPointList);
-  // console.log(tree);
+  console.log(tree);
   const treeVis = new TreeVis(tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new TwoDVis(tree);
   twoDVis.drawVis(tree.root);
   // setScene();
-  console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
-  console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
+  // console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
+  // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
   // const heap = new MaxHeap();
   // heap.insert(1);
   // heap.insert(5);
@@ -45,4 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // heap.insert(11);
   // heap.insert(7);
   // heap.insert(2);
+  // const boidVis = new BoidVis(tree);
+
 });

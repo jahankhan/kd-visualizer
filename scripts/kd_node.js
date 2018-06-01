@@ -1,3 +1,4 @@
+import TwoDVector from './vector.js';
 import { LEFT_OFFSET, RIGHT_OFFSET, Y_OFFSET } from './tree_vis';
 
 class KDNode {
@@ -9,6 +10,7 @@ class KDNode {
     this.dim = dim;
     this.x = 150;
     this.y = 100;
+    this.velocity = new TwoDVector(0,0);
   }
 
   addLeftChild(node) {

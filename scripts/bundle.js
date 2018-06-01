@@ -71,6 +71,54 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./scripts/boid_vis.js":
+/*!*****************************!*\
+  !*** ./scripts/boid_vis.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+
+
+class BoidVis {
+  constructor(tree) {
+    this.tree = tree;
+    this.ctx = document.getElementById("boidCanvas").getContext("2d");
+    this.width = 600;
+    this.height = 600;
+    this.ctx.beginPath();
+    this.ctx.strokeRect(0, 0, 600, 600);
+    window.setInterval(() => {
+      console.log('going');
+      this.drawVis();
+    }, 1000);
+  }
+
+  drawVis() {
+    let nodes = this.tree.getPoints(this.tree.root);
+    for(let i = 0; i < nodes.length; i++) {
+      this.drawPoint(nodes[i]);
+    }
+    this.tree.step();
+  }
+
+  drawPoint(node) {
+    this.ctx.beginPath();
+    this.ctx.arc(node.data[0], 600 - node.data[1], 2, 0, _tree_vis__WEBPACK_IMPORTED_MODULE_0__["FULL_CIRCLE"], true);
+    this.ctx.fill();
+  }
+
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (BoidVis);
+
+
+/***/ }),
+
 /***/ "./scripts/heap.js":
 /*!*************************!*\
   !*** ./scripts/heap.js ***!
@@ -174,9 +222,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
 /* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
 /* harmony import */ var _two_d_vis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./two_d_vis */ "./scripts/two_d_vis.js");
-/* harmony import */ var _heap_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./heap.js */ "./scripts/heap.js");
-/* harmony import */ var _three_d_vis__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./three_d_vis */ "./scripts/three_d_vis.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _heap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./heap */ "./scripts/heap.js");
+/* harmony import */ var _boid_vis__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./boid_vis */ "./scripts/boid_vis.js");
+/* harmony import */ var _three_d_vis__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./three_d_vis */ "./scripts/three_d_vis.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -202,20 +252,24 @@ document.addEventListener('DOMContentLoaded', () => {
     [2,7],
     [9,8],
     [5,7],
-    [5,6]
+    [5,6],
+    [1,3],
+    [4,2],
+    [7,5],
+    [12,7],
   ];
   // console.log(pointList);
 
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](null, 2);
   tree.buildOptimalTree(twodPointList);
-  // console.log(tree);
+  console.log(tree);
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);
   twoDVis.drawVis(tree.root);
   // setScene();
-  console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
-  console.log(tree.kNearestNeigbors([2,5], tree.root, new _heap_js__WEBPACK_IMPORTED_MODULE_4__["default"]()));
+  // console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
+  // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
   // const heap = new MaxHeap();
   // heap.insert(1);
   // heap.insert(5);
@@ -224,6 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // heap.insert(11);
   // heap.insert(7);
   // heap.insert(2);
+  // const boidVis = new BoidVis(tree);
+
 });
 
 
@@ -238,7 +294,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+/* harmony import */ var _vector_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vector.js */ "./scripts/vector.js");
+/* harmony import */ var _tree_vis__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tree_vis */ "./scripts/tree_vis.js");
+
 
 
 class KDNode {
@@ -250,22 +308,23 @@ class KDNode {
     this.dim = dim;
     this.x = 150;
     this.y = 100;
+    this.velocity = new _vector_js__WEBPACK_IMPORTED_MODULE_0__["default"](0,0);
   }
 
   addLeftChild(node) {
     this.leftChild = node;
     node.parent = this;
     node.dim = (this.dim + 1) % 2;
-    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["LEFT_OFFSET"];
-    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
+    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_1__["LEFT_OFFSET"];
+    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_1__["Y_OFFSET"];
   }
 
   addRightChild(node) {
     this.rightChild = node;
     node.parent = this;
     node.dim = (this.dim + 1) % 2;
-    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["RIGHT_OFFSET"];
-    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_0__["Y_OFFSET"];
+    node.x = node.parent.x + _tree_vis__WEBPACK_IMPORTED_MODULE_1__["RIGHT_OFFSET"];
+    node.y = node.parent.y + _tree_vis__WEBPACK_IMPORTED_MODULE_1__["Y_OFFSET"];
   }
 }
 
@@ -285,7 +344,9 @@ class KDNode {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
 /* harmony import */ var _heap_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./heap.js */ "./scripts/heap.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _vector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vector.js */ "./scripts/vector.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -311,7 +372,7 @@ class KDTree {
       return pointList;
     }
     // console.log(pointList);
-    const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["sortByDimension"])(pointList, dim);
+    const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_3__["sortByDimension"])(pointList, dim);
 
     let pivot;
     let mid;
@@ -326,8 +387,8 @@ class KDTree {
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
-    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["getNextDim"])(dim, this.dims));
-    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["getNextDim"])(dim, this.dims));
+    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_3__["getNextDim"])(dim, this.dims));
+    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_3__["getNextDim"])(dim, this.dims));
   }
 
   assignPoint(point, node) {
@@ -400,8 +461,11 @@ class KDTree {
   kNearestNeigbors(queryPoint, node, champions, k=3, hash = {}) {
 
     if (node) {
+      if(isNaN(node.data[0])){
+        debugger
+      }
       let distance = this.euclideanDistance(queryPoint, node.data);
-      // console.log(distance);
+      console.log(distance);
       if(champions.size() < k) {
         champions.insert(distance);
         hash[distance] = node;
@@ -428,6 +492,7 @@ class KDTree {
         for(let i = 0; i < champions.size(); i++) {
           results.push(hash[champions.heap[i]]);
         }
+        debugger
         return results;
       }
       return champions;
@@ -441,7 +506,90 @@ class KDTree {
     }
     // console.log(dimValues);
     let sum = dimValues.reduce((acc, currVal) => acc + currVal)
+    if(isNaN(Math.sqrt(sum))) {
+      debugger
+    }
     return Math.sqrt(sum);
+  }
+
+  centerOfMass(node) {
+    // const nodes = this.getPoints(this.root);
+    const nodes = this.kNearestNeigbors(node.data, this.root, new _heap_js__WEBPACK_IMPORTED_MODULE_1__["default"](), 10);
+    // let cOfMass = [0, 0];
+    // console.log(nodes);
+    let cOfMass = null;
+    for(let i = 0; i < nodes.length; i++) {
+      if(node.data !== nodes[i].data) {
+        if(cOfMass === null) {
+          debugger
+          cOfMass = new _vector_js__WEBPACK_IMPORTED_MODULE_2__["default"](nodes[i].data[0], nodes[i].data[1]);
+        } else {
+          cOfMass.addVector(nodes[i].data);
+        }
+      }
+    }
+    debugger
+    cOfMass.divideVector(nodes.length-1);
+    return cOfMass.addVector(node.data).divideVector(100);
+  }
+
+  avoidCollision(node) {
+    let vector = new _vector_js__WEBPACK_IMPORTED_MODULE_2__["default"](0,0);
+    let nodes = this.getPoints(this.root);
+    for(let i = 0; i < nodes.length; i++) {
+      if(nodes[i].data !== node.data) {
+        let distance = this.euclideanDistance(nodes[i].data, node.data);
+        if(Math.abs(distance) < 100) {
+          vector.addVector(-distance);
+        }
+      }
+    }
+    return vector;
+  }
+
+  matchVelocity(node) {
+    let vector = null;
+    let nodes = this.kNearestNeigbors(node.data, this.root, new _heap_js__WEBPACK_IMPORTED_MODULE_1__["default"](), 10);
+    for(let i = 0; i < nodes.length; i++) {
+      if(nodes[i].data !== nodes.data) {
+        if(vector === null) {
+          vector = new _vector_js__WEBPACK_IMPORTED_MODULE_2__["default"](nodes[i].data[0], nodes[i].data[1]);
+        } else {
+          vector.addVector(nodes[i].velocity);
+        }
+      }
+    }
+    vector.divideVector(nodes.length-1);
+    return vector.addVector(node.velocity).divideVector(8);
+  }
+
+  bounding_box(node) {
+    const xMin = 0, xMax = 600, yMin = 0, yMax = 600;
+    let vector = new _vector_js__WEBPACK_IMPORTED_MODULE_2__["default"](0,0);
+    if(node.data[0] < xMin) {
+      vector.x = 10;
+    } else if(node.data[0] > xMax) {
+      vector.x = -10;
+    } else if(node.data[1] < yMin) {
+      vector.y = 10;
+    } else if(node.data[1] > yMin) {
+      vector.y = -10;
+    }
+    return vector;
+  }
+
+  step() {
+    let nodes = this.getPoints(this.root);
+    let v1, v2, v3, v4;
+    for(let i = 0; i < nodes.length; i++) {
+      v1 = this.centerOfMass(nodes[i]);
+      v2 = this.avoidCollision(nodes[i]);
+      v3 = this.matchVelocity(nodes[i]);
+      v4 = this.bounding_box(nodes[i]);
+      nodes[i].velocity.addVector(v1).addVector(v2).addVector(v3).addVector(v4);
+      nodes[i].data[0] += nodes[i].velocity.x;
+      nodes[i].data[1] += nodes[i].velocity.y;
+    }
   }
 }
 
@@ -563,9 +711,9 @@ const FULL_CIRCLE = Math.PI * 2;
 const LEFT_START = -(NODE_RADIUS/Math.sqrt(2));
 const RIGHT_START = (NODE_RADIUS/Math.sqrt(2));
 const Y_START = (NODE_RADIUS/Math.sqrt(2));
-const LEFT_OFFSET = -40;
-const RIGHT_OFFSET = 40;
-const Y_OFFSET = 50;
+const LEFT_OFFSET = -60;
+const RIGHT_OFFSET = 60;
+const Y_OFFSET = 40;
 const X = 600;
 const Y = 600;
 
@@ -724,6 +872,39 @@ class TwoDVis {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (TwoDVis);
+
+
+/***/ }),
+
+/***/ "./scripts/vector.js":
+/*!***************************!*\
+  !*** ./scripts/vector.js ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class TwoDVector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  addVector(vector) {
+    this.x += vector[0];
+    this.y += vector[1];
+    return this;
+  }
+
+  divideVector(constant) {
+    this.x /= constant;
+    this.y /= constant;
+    return this;
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (TwoDVector);
 
 
 /***/ })

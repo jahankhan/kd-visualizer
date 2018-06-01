@@ -1,5 +1,6 @@
 import KDNode from './kd_node';
 import MaxHeap from './heap.js';
+import TwoDVector from './vector.js';
 import { sortByDimension, getNextDim } from './tree_util';
 
 class KDTree {
@@ -112,8 +113,11 @@ class KDTree {
   kNearestNeigbors(queryPoint, node, champions, k=3, hash = {}) {
 
     if (node) {
+      if(isNaN(node.data[0])){
+        debugger
+      }
       let distance = this.euclideanDistance(queryPoint, node.data);
-      // console.log(distance);
+      console.log(distance);
       if(champions.size() < k) {
         champions.insert(distance);
         hash[distance] = node;
@@ -140,6 +144,7 @@ class KDTree {
         for(let i = 0; i < champions.size(); i++) {
           results.push(hash[champions.heap[i]]);
         }
+        debugger
         return results;
       }
       return champions;
@@ -153,7 +158,90 @@ class KDTree {
     }
     // console.log(dimValues);
     let sum = dimValues.reduce((acc, currVal) => acc + currVal)
+    if(isNaN(Math.sqrt(sum))) {
+      debugger
+    }
     return Math.sqrt(sum);
+  }
+
+  centerOfMass(node) {
+    // const nodes = this.getPoints(this.root);
+    const nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 10);
+    // let cOfMass = [0, 0];
+    // console.log(nodes);
+    let cOfMass = null;
+    for(let i = 0; i < nodes.length; i++) {
+      if(node.data !== nodes[i].data) {
+        if(cOfMass === null) {
+          debugger
+          cOfMass = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
+        } else {
+          cOfMass.addVector(nodes[i].data);
+        }
+      }
+    }
+    debugger
+    cOfMass.divideVector(nodes.length-1);
+    return cOfMass.addVector(node.data).divideVector(100);
+  }
+
+  avoidCollision(node) {
+    let vector = new TwoDVector(0,0);
+    let nodes = this.getPoints(this.root);
+    for(let i = 0; i < nodes.length; i++) {
+      if(nodes[i].data !== node.data) {
+        let distance = this.euclideanDistance(nodes[i].data, node.data);
+        if(Math.abs(distance) < 100) {
+          vector.addVector(-distance);
+        }
+      }
+    }
+    return vector;
+  }
+
+  matchVelocity(node) {
+    let vector = null;
+    let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 10);
+    for(let i = 0; i < nodes.length; i++) {
+      if(nodes[i].data !== nodes.data) {
+        if(vector === null) {
+          vector = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
+        } else {
+          vector.addVector(nodes[i].velocity);
+        }
+      }
+    }
+    vector.divideVector(nodes.length-1);
+    return vector.addVector(node.velocity).divideVector(8);
+  }
+
+  bounding_box(node) {
+    const xMin = 0, xMax = 600, yMin = 0, yMax = 600;
+    let vector = new TwoDVector(0,0);
+    if(node.data[0] < xMin) {
+      vector.x = 10;
+    } else if(node.data[0] > xMax) {
+      vector.x = -10;
+    } else if(node.data[1] < yMin) {
+      vector.y = 10;
+    } else if(node.data[1] > yMin) {
+      vector.y = -10;
+    }
+    return vector;
+  }
+
+  step() {
+    let nodes = this.getPoints(this.root);
+    let v1, v2, v3, v4;
+    for(let i = 0; i < nodes.length; i++) {
+      v1 = this.centerOfMass(nodes[i]);
+      v2 = this.avoidCollision(nodes[i]);
+      v3 = this.matchVelocity(nodes[i]);
+      v4 = this.bounding_box(nodes[i]);
+      nodes[i].velocity.addVector(v1).addVector(v2).addVector(v3).addVector(v4);
+      nodes[i].data[0] += nodes[i].velocity.x;
+      nodes[i].data[1] += nodes[i].velocity.y;
+    }
   }
 }
 
