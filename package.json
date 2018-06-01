@@ -8,7 +8,7 @@
     "npm": "6.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jasmine",
     "webpack": "webpack --mode=development --watch",
     "postinstall": "webpack --mode=production"
   },
@@ -27,6 +27,8 @@
     "webpack": "^4.8.1"
   },
   "devDependencies": {
+    "jasmine": "^3.1.0",
+    "jasmine-es6": "^0.4.3",
     "webpack-cli": "^2.1.3"
   }
 }

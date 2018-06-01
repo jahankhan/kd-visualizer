@@ -262,13 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](null, 2);
   tree.buildOptimalTree(twodPointList);
-  console.log(tree);
+  console.log(tree.getPoints(tree.root));
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);
   twoDVis.drawVis(tree.root);
   // setScene();
-  // console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
+  // console.
+  // console.log(tree.rangeSearch(tree.root, [[1, 4], [1, 6]]));
   // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
   // const heap = new MaxHeap();
   // heap.insert(1);

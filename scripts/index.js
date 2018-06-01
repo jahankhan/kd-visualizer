@@ -34,13 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tree = new KDTree(null, 2);
   tree.buildOptimalTree(twodPointList);
-  console.log(tree);
+  console.log(tree.getPoints(tree.root));
   const treeVis = new TreeVis(tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new TwoDVis(tree);
   twoDVis.drawVis(tree.root);
   // setScene();
-  // console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
+  // console.
+  // console.log(tree.rangeSearch(tree.root, [[1, 4], [1, 6]]));
   // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
   // const heap = new MaxHeap();
   // heap.insert(1);
