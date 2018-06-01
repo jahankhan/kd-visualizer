@@ -19,6 +19,10 @@ class MaxHeap {
     return this.heap[0];
   }
 
+  size() {
+    return this.heap.length;
+  }
+
   insert(el) {
     this.heap.push(el);
     this._heapifyUp();

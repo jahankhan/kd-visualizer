@@ -1,4 +1,5 @@
 import KDNode from './kd_node';
+import MaxHeap from './heap.js';
 import { sortByDimension, getNextDim } from './tree_util';
 
 class KDTree {
@@ -108,28 +109,51 @@ class KDTree {
     return champions;
   }
 
-  // kNearestNeigbors(queryPoint, node, champions = [], k=1) {
-  //   if (node) {
-  //     let distance = this.euclideanDistance(queryPoint, node);
-  //     if(champions.length < k) {
-  //       champions.push([node, distance]);
-  //     } else {
-  //       if(distance < champions[0][1]) {
-  //
-  //       }
-  //     }
-  //   }
-  //
-  //
-  // }
+  kNearestNeigbors(queryPoint, node, champions, k=3, hash = {}) {
+
+    if (node) {
+      let distance = this.euclideanDistance(queryPoint, node.data);
+      // console.log(distance);
+      if(champions.size() < k) {
+        champions.insert(distance);
+        hash[distance] = node;
+        if(queryPoint[node.dim] <= node[node.dim]){
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+        } else {
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+        }
+      } else {
+        if(distance < champions.peek()) {
+          hash[distance] = node;
+          champions.extract();
+          champions.insert(distance);
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+        } else {
+          return champions;
+        }
+      }
+      if(this.root === node) {
+        let results = [];
+        for(let i = 0; i < champions.size(); i++) {
+          results.push(hash[champions.heap[i]]);
+        }
+        return results;
+      }
+      return champions;
+    }
+  }
 
   euclideanDistance(pointA, pointB) {
     let dimValues = [];
     for(let i = 0; i < pointA.length; i++) {
       dimValues.push((pointA[i] - pointB[i])**2);
     }
-    // return Math.sqrt(dimValues.reduce((acc, currVal) => acc + currVal;));
-    return 5;
+    // console.log(dimValues);
+    let sum = dimValues.reduce((acc, currVal) => acc + currVal)
+    return Math.sqrt(sum);
   }
 }
 

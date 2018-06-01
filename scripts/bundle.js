@@ -101,6 +101,10 @@ class MaxHeap {
     return this.heap[0];
   }
 
+  size() {
+    return this.heap.length;
+  }
+
   insert(el) {
     this.heap.push(el);
     this._heapifyUp();
@@ -211,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   twoDVis.drawVis(tree.root);
   // setScene();
   console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
-  console.log(tree.kNearestNeigborsNaive([2,5], tree.getPoints(tree.root)));
+  console.log(tree.kNearestNeigbors([2,5], tree.root, new _heap_js__WEBPACK_IMPORTED_MODULE_4__["default"]()));
   // const heap = new MaxHeap();
   // heap.insert(1);
   // heap.insert(5);
@@ -280,7 +284,9 @@ class KDNode {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _kd_node__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./kd_node */ "./scripts/kd_node.js");
-/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+/* harmony import */ var _heap_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./heap.js */ "./scripts/heap.js");
+/* harmony import */ var _tree_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tree_util */ "./scripts/tree_util.js");
+
 
 
 
@@ -305,7 +311,7 @@ class KDTree {
       return pointList;
     }
     // console.log(pointList);
-    const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["sortByDimension"])(pointList, dim);
+    const sortedList = Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["sortByDimension"])(pointList, dim);
 
     let pivot;
     let mid;
@@ -320,8 +326,8 @@ class KDTree {
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
-    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim, this.dims));
-    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_1__["getNextDim"])(dim, this.dims));
+    this.buildOptimalTree(leftPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["getNextDim"])(dim, this.dims));
+    this.buildOptimalTree(rightPointList, Object(_tree_util__WEBPACK_IMPORTED_MODULE_2__["getNextDim"])(dim, this.dims));
   }
 
   assignPoint(point, node) {
@@ -391,28 +397,51 @@ class KDTree {
     return champions;
   }
 
-  // kNearestNeigbors(queryPoint, node, champions = [], k=1) {
-  //   if (node) {
-  //     let distance = this.euclideanDistance(queryPoint, node);
-  //     if(champions.length < k) {
-  //       champions.push([node, distance]);
-  //     } else {
-  //       if(distance < champions[0][1]) {
-  //
-  //       }
-  //     }
-  //   }
-  //
-  //
-  // }
+  kNearestNeigbors(queryPoint, node, champions, k=3, hash = {}) {
+
+    if (node) {
+      let distance = this.euclideanDistance(queryPoint, node.data);
+      // console.log(distance);
+      if(champions.size() < k) {
+        champions.insert(distance);
+        hash[distance] = node;
+        if(queryPoint[node.dim] <= node[node.dim]){
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+        } else {
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+        }
+      } else {
+        if(distance < champions.peek()) {
+          hash[distance] = node;
+          champions.extract();
+          champions.insert(distance);
+          this.kNearestNeigbors(queryPoint, node.leftChild, champions, k, hash);
+          this.kNearestNeigbors(queryPoint, node.rightChild, champions, k, hash);
+        } else {
+          return champions;
+        }
+      }
+      if(this.root === node) {
+        let results = [];
+        for(let i = 0; i < champions.size(); i++) {
+          results.push(hash[champions.heap[i]]);
+        }
+        return results;
+      }
+      return champions;
+    }
+  }
 
   euclideanDistance(pointA, pointB) {
     let dimValues = [];
     for(let i = 0; i < pointA.length; i++) {
       dimValues.push((pointA[i] - pointB[i])**2);
     }
-    // return Math.sqrt(dimValues.reduce((acc, currVal) => acc + currVal;));
-    return 5;
+    // console.log(dimValues);
+    let sum = dimValues.reduce((acc, currVal) => acc + currVal)
+    return Math.sqrt(sum);
   }
 }
 

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   twoDVis.drawVis(tree.root);
   // setScene();
   console.log(tree.rangeSearch(tree.root, [[2, 3], [5, 8]]));
-  console.log(tree.kNearestNeigborsNaive([2,5], tree.getPoints(tree.root)));
+  console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
   // const heap = new MaxHeap();
   // heap.insert(1);
   // heap.insert(5);
