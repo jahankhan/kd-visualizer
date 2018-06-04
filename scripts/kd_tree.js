@@ -188,11 +188,15 @@ class KDTree {
   avoidCollision(node) {
     let vector = new TwoDVector(0,0);
     let nodes = this.getPoints(this.root);
+    debugger
     for(let i = 0; i < nodes.length; i++) {
       if(nodes[i].data !== node.data) {
+        let distanceX = this.euclideanDistance(nodes[i].data[0], node.data[0]);
+        let distanceY = this.euclideanDistance(nodes[i].data[1], node.data[1]);
         let distance = this.euclideanDistance(nodes[i].data, node.data);
+
         if(Math.abs(distance) < 100) {
-          vector.addVector(-distance);
+          vector.addVector([-distanceX, -distanceY]);
         }
       }
     }
@@ -207,12 +211,12 @@ class KDTree {
         if(vector === null) {
           vector = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
         } else {
-          vector.addVector(nodes[i].velocity);
+          vector.addVectors(nodes[i].velocity);
         }
       }
     }
     vector.divideVector(nodes.length-1);
-    return vector.addVector(node.velocity).divideVector(8);
+    return vector.addVectors(node.velocity).divideVector(8);
   }
 
   bounding_box(node) {
@@ -238,7 +242,7 @@ class KDTree {
       v2 = this.avoidCollision(nodes[i]);
       v3 = this.matchVelocity(nodes[i]);
       v4 = this.bounding_box(nodes[i]);
-      nodes[i].velocity.addVector(v1).addVector(v2).addVector(v3).addVector(v4);
+      nodes[i].velocity.addVectors(v1).addVectors(v2).addVectors(v3).addVectors(v4);
       nodes[i].data[0] += nodes[i].velocity.x;
       nodes[i].data[1] += nodes[i].velocity.y;
     }

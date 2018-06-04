@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // setScene();
   // console.
   // console.log(tree.rangeSearch(tree.root, [[1, 4], [1, 6]]));
-  // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap()));
+  // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap(), 10));
+  // console.log(tree.kNearestNeigbors([2,7], tree.root, new MaxHeap(), 10));
   // const heap = new MaxHeap();
   // heap.insert(1);
   // heap.insert(5);
@@ -51,6 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // heap.insert(11);
   // heap.insert(7);
   // heap.insert(2);
-  // const boidVis = new BoidVis(tree);
+  const boidVis = new BoidVis(tree);
 
 });
