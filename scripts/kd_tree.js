@@ -42,7 +42,6 @@ class KDTree {
     if(pointList.length === 0) {
       return pointList;
     }
-    // console.log(pointList);
     const sortedList = sortByDimension(pointList, dim);
 
     let pivot;
@@ -54,7 +53,6 @@ class KDTree {
       mid = Math.floor(pointList.length/2);
       pivot = pointList[mid];
     }
-    // console.log(pivot);
     this.assignPoint(pivot, this.root);
     const leftPointList = sortedList.slice(0, mid);
     const rightPointList = sortedList.slice(mid+1);
@@ -73,7 +71,6 @@ class KDTree {
         this.assignPoint(point, node.leftChild);
       }
     } else {
-      // debugger
       if(node.rightChild === null) {
         node.addRightChild(new KDNode(point));
       } else {
@@ -84,7 +81,6 @@ class KDTree {
 
   rangeSearch(node, bounds) {
     let nodeList = [];
-    // debugger
     if(node) {
       if(node.data[0] >= bounds[0][0] && node.data[0] <= bounds[0][1] &&
           node.data[1] >= bounds[1][0] && node.data[1] <= bounds[1][1]) {
@@ -132,12 +128,8 @@ class KDTree {
   kNearestNeigbors(queryPoint, node, champions, k=3, hash = {}) {
 
     if (node) {
-      if(isNaN(node.data[0])){
-        debugger
-      }
       let distance = this.euclideanDistance(queryPoint, node.data);
-      // console.log(distance);
-      // console.log(node.data[0], node.data[1]);
+
       if(champions.size() < k) {
         champions.insert(distance);
         hash[distance] = node;
@@ -164,7 +156,6 @@ class KDTree {
         for(let i = 0; i < champions.size(); i++) {
           results.push(hash[champions.heap[i]]);
         }
-        // debugger
         return results;
       }
       return champions;
@@ -176,14 +167,7 @@ class KDTree {
     for(let i = 0; i < pointA.length; i++) {
       dimValues.push((pointA[i] - pointB[i])**2);
     }
-    // console.log(dimValues);
-    if(dimValues.length === 0) {
-      // debugger
-    }
     let sum = dimValues.reduce((acc, currVal) => acc + currVal)
-    if(isNaN(Math.sqrt(sum))) {
-      // debugger
-    }
     return Math.sqrt(sum);
   }
 
@@ -196,38 +180,27 @@ class KDTree {
   }
 
   centerOfMass(node) {
-    const nodes = this.getPoints(this.root);
-    // const nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
-    // let cOfMass = [0, 0];
-    // console.log(nodes);
-    // debugger
+    const nodes = this.getPoints(this.root);=
     let cOfMass = null;
     for(let i = 0; i < nodes.length; i++) {
       if(node.data !== nodes[i].data) {
         if(cOfMass === null) {
-          // debugger
           cOfMass = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
         } else {
           cOfMass.addVector(nodes[i].data);
         }
       }
     }
-    // debugger
     cOfMass.divideVector(nodes.length-1);
     cOfMass.subVector(node.data).divideVector(100);
-    // debugger
     return cOfMass;
   }
 
   avoidCollision(node) {
     let vector = new TwoDVector(0,0);
     let nodes = this.getPoints(this.root);
-    // let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
-    // debugger
     for(let i = 0; i < nodes.length; i++) {
       if(nodes[i].data !== node.data) {
-        // let distanceX = this.euclideanDistance([nodes[i].data[0]], [node.data[0]]);
-        // let distanceY = this.euclideanDistance([nodes[i].data[1]], [node.data[1]]);
         let eDistance = this.euclideanDistance(nodes[i].data, node.data);
         let distance = this.positionDistance(nodes[i].data, node.data);
 
@@ -236,13 +209,11 @@ class KDTree {
         }
       }
     }
-    // debugger
     return vector.divideVector(100);
   }
 
   matchVelocity(node) {
     let vector = null;
-    // let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
     let nodes = this.getPoints(this.root);
     for(let i = 0; i < nodes.length; i++) {
       if(nodes[i].data !== nodes.data) {
@@ -254,7 +225,6 @@ class KDTree {
       }
     }
     vector.divideVector(nodes.length-1);
-    // debugger
     return vector.addVectors(node.velocity).divideVector(8);
   }
 
@@ -276,7 +246,6 @@ class KDTree {
 
 
   goalSetting(node) {
-    // let vector = new TwoDVector(this.path[0][0], this.path[0][1]);
     let vector = new TwoDVector(this.pointer[0], this.pointer[1]);
     if(node.data[0] < vector.x) {
       vector.x = 14;
@@ -304,7 +273,6 @@ class KDTree {
   followTheLeader(node, leader = [300, 300]) {
     let vector = new TwoDVector(0,0);
     let distance = this.euclideanDistance(leader, node.data)
-    // let distance = 100;
     if(node.data[0] < leader.data[0]) {
       vector.x = distance/100;
     } else if (node.data[0] > leader.data[0]) {
@@ -330,12 +298,8 @@ class KDTree {
       v2 = this.avoidCollision(nodes[i]);
       v3 = this.matchVelocity(nodes[i]);
       v4 = this.bounding_box(nodes[i]);
-      // v5 = this.followTheLeader(nodes[i], nodes[0]);
       v5 = this.goalSetting(nodes[i]);
-      // debugger
       nodes[i].velocity.addVectors(v1).addVectors(v2).addVectors(v3).addVectors(v4).addVectors(v5);
-      // nodes[i].velocity.addVectors(v1).addVectors(v3).addVectors(v4);
-      // debugger
       if(nodes[i].velocity.x > 50) {
         nodes[i].velocity.x = 50;
       } else if(nodes[i].velocity.x < -50) {
@@ -348,7 +312,6 @@ class KDTree {
       }
       nodes[i].data[0] += nodes[i].velocity.x;
       nodes[i].data[1] += nodes[i].velocity.y;
-      // debugger
     }
   }
 }
