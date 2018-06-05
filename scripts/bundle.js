@@ -472,7 +472,6 @@ class KDTree {
 
     for(let i = 0; i < points.length; i++) {
       let distance = Math.sqrt((queryPoint[0] - points[i].data[0])**2 + (queryPoint[1] - points[i].data[1])**2);
-      // console.log(distance, points[i]);
       if(distance < champions[0][1]) {
         champions.shift();
         champions.unshift([points[i], distance]);
