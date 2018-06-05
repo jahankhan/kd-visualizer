@@ -7,6 +7,25 @@ class KDTree {
   constructor(root = null, dims) {
     this.root = root;
     this.dims = dims;
+    this.pointer = [300, 300];
+    this.path = [
+      [50, 50],
+      [500, 50],
+      [1200, 50],
+      [500, 400],
+      [50, 400],
+      [500, 700],
+      [1200, 700],
+      [600, 700],
+      [600, 500],
+      [600, 300],
+      [600, 100],
+      [600, 0],
+      [600, 200],
+    ];
+    window.setInterval(() => {
+      this.path.push(this.path.shift());
+    }, 1500);
   }
 
   buildTree(pointList) {
@@ -101,7 +120,7 @@ class KDTree {
 
     for(let i = 0; i < points.length; i++) {
       let distance = Math.sqrt((queryPoint[0] - points[i].data[0])**2 + (queryPoint[1] - points[i].data[1])**2);
-      console.log(distance, points[i]);
+      // console.log(distance, points[i]);
       if(distance < champions[0][1]) {
         champions.shift();
         champions.unshift([points[i], distance]);
@@ -117,7 +136,8 @@ class KDTree {
         debugger
       }
       let distance = this.euclideanDistance(queryPoint, node.data);
-      console.log(distance);
+      // console.log(distance);
+      // console.log(node.data[0], node.data[1]);
       if(champions.size() < k) {
         champions.insert(distance);
         hash[distance] = node;
@@ -144,7 +164,7 @@ class KDTree {
         for(let i = 0; i < champions.size(); i++) {
           results.push(hash[champions.heap[i]]);
         }
-        debugger
+        // debugger
         return results;
       }
       return champions;
@@ -157,94 +177,178 @@ class KDTree {
       dimValues.push((pointA[i] - pointB[i])**2);
     }
     // console.log(dimValues);
+    if(dimValues.length === 0) {
+      // debugger
+    }
     let sum = dimValues.reduce((acc, currVal) => acc + currVal)
     if(isNaN(Math.sqrt(sum))) {
-      debugger
+      // debugger
     }
     return Math.sqrt(sum);
   }
 
+  positionDistance(pointA, pointB) {
+    let position = [];
+    for(let i = 0; i < pointA.length; i++) {
+      position.push(Math.abs(pointA[i] - pointB[i]));
+    }
+    return position;
+  }
+
   centerOfMass(node) {
-    // const nodes = this.getPoints(this.root);
-    const nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 10);
+    const nodes = this.getPoints(this.root);
+    // const nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
     // let cOfMass = [0, 0];
     // console.log(nodes);
+    // debugger
     let cOfMass = null;
     for(let i = 0; i < nodes.length; i++) {
       if(node.data !== nodes[i].data) {
         if(cOfMass === null) {
-          debugger
+          // debugger
           cOfMass = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
         } else {
           cOfMass.addVector(nodes[i].data);
         }
       }
     }
-    debugger
+    // debugger
     cOfMass.divideVector(nodes.length-1);
-    return cOfMass.addVector(node.data).divideVector(100);
+    cOfMass.subVector(node.data).divideVector(100);
+    // debugger
+    return cOfMass;
   }
 
   avoidCollision(node) {
     let vector = new TwoDVector(0,0);
     let nodes = this.getPoints(this.root);
-    debugger
+    // let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
+    // debugger
     for(let i = 0; i < nodes.length; i++) {
       if(nodes[i].data !== node.data) {
-        let distanceX = this.euclideanDistance(nodes[i].data[0], node.data[0]);
-        let distanceY = this.euclideanDistance(nodes[i].data[1], node.data[1]);
-        let distance = this.euclideanDistance(nodes[i].data, node.data);
+        // let distanceX = this.euclideanDistance([nodes[i].data[0]], [node.data[0]]);
+        // let distanceY = this.euclideanDistance([nodes[i].data[1]], [node.data[1]]);
+        let eDistance = this.euclideanDistance(nodes[i].data, node.data);
+        let distance = this.positionDistance(nodes[i].data, node.data);
 
-        if(Math.abs(distance) < 100) {
-          vector.addVector([-distanceX, -distanceY]);
+        if(Math.abs(eDistance) < 40) {
+          vector.addVector(distance);
         }
       }
     }
-    return vector;
+    // debugger
+    return vector.divideVector(100);
   }
 
   matchVelocity(node) {
     let vector = null;
-    let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 10);
+    // let nodes = this.kNearestNeigbors(node.data, this.root, new MaxHeap(), 100);
+    let nodes = this.getPoints(this.root);
     for(let i = 0; i < nodes.length; i++) {
       if(nodes[i].data !== nodes.data) {
         if(vector === null) {
-          vector = new TwoDVector(nodes[i].data[0], nodes[i].data[1]);
+          vector = nodes[i].velocity;
         } else {
           vector.addVectors(nodes[i].velocity);
         }
       }
     }
     vector.divideVector(nodes.length-1);
+    // debugger
     return vector.addVectors(node.velocity).divideVector(8);
   }
 
   bounding_box(node) {
-    const xMin = 0, xMax = 600, yMin = 0, yMax = 600;
+    const xMin = 100, xMax = 1000, yMin = 100, yMax = 700;
     let vector = new TwoDVector(0,0);
     if(node.data[0] < xMin) {
-      vector.x = 10;
+      vector.x = 14;
     } else if(node.data[0] > xMax) {
-      vector.x = -10;
+      vector.x = -14;
     } else if(node.data[1] < yMin) {
-      vector.y = 10;
-    } else if(node.data[1] > yMin) {
-      vector.y = -10;
+      vector.y = 14;
+    } else if(node.data[1] > yMax) {
+      vector.y = -14;
     }
     return vector;
   }
 
+
+
+  goalSetting(node) {
+    // let vector = new TwoDVector(this.path[0][0], this.path[0][1]);
+    let vector = new TwoDVector(this.pointer[0], this.pointer[1]);
+    if(node.data[0] < vector.x) {
+      vector.x = 14;
+    } else if(node.data[0] > vector.x ) {
+      vector.x = -14;
+    }
+    if(node.data[1] < vector.y) {
+      vector.y = 14;
+    } else if(node.data[1] > vector.y ) {
+      vector.y = -14;
+    }
+    return vector;
+  }
+
+  createBoids(k) {
+    const boids = [];
+    for(let i = 0; i < k; i++){
+      let x = Math.floor(Math.random() * 1400);
+      let y = Math.floor(Math.random() * 1400);
+      boids.push([x, y]);
+    }
+    return boids;
+  }
+
+  followTheLeader(node, leader = [300, 300]) {
+    let vector = new TwoDVector(0,0);
+    let distance = this.euclideanDistance(leader, node.data)
+    // let distance = 100;
+    if(node.data[0] < leader.data[0]) {
+      vector.x = distance/100;
+    } else if (node.data[0] > leader.data[0]) {
+      vector.x = -(distance/100);
+    }
+    if(node.data[1] < leader.data[1]) {
+      vector.y = distance/100;
+    } else if (node.data[1] > leader.data[1]) {
+      vector.y = -(distance/100);
+    }
+    return vector;
+  }
+
+  setPointer(x, y) {
+    this.pointer = [x, y];
+  }
+
   step() {
     let nodes = this.getPoints(this.root);
-    let v1, v2, v3, v4;
+    let v1, v2, v3, v4, v5;
     for(let i = 0; i < nodes.length; i++) {
       v1 = this.centerOfMass(nodes[i]);
       v2 = this.avoidCollision(nodes[i]);
       v3 = this.matchVelocity(nodes[i]);
       v4 = this.bounding_box(nodes[i]);
-      nodes[i].velocity.addVectors(v1).addVectors(v2).addVectors(v3).addVectors(v4);
+      // v5 = this.followTheLeader(nodes[i], nodes[0]);
+      v5 = this.goalSetting(nodes[i]);
+      // debugger
+      nodes[i].velocity.addVectors(v1).addVectors(v2).addVectors(v3).addVectors(v4).addVectors(v5);
+      // nodes[i].velocity.addVectors(v1).addVectors(v3).addVectors(v4);
+      // debugger
+      if(nodes[i].velocity.x > 50) {
+        nodes[i].velocity.x = 50;
+      } else if(nodes[i].velocity.x < -50) {
+        nodes[i].velocity.x = -50;
+      }
+      if(nodes[i].velocity.y > 50) {
+        nodes[i].velocity.y = 50;
+      } else if(nodes[i].velocity.y < -50) {
+        nodes[i].velocity.y = -50;
+      }
       nodes[i].data[0] += nodes[i].velocity.x;
       nodes[i].data[1] += nodes[i].velocity.y;
+      // debugger
     }
   }
 }

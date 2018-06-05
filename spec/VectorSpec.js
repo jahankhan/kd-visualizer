@@ -33,4 +33,20 @@ describe("TwoDVector", () => {
       expect(twoDVector.y).toEqual(9);
     });
   });
+
+  describe("subVector", () => {
+    it("should be able to subtract a point to the vector", () => {
+      twoDVector.subVector([2, 3]);
+      expect(twoDVector.x).toEqual(8);
+      expect(twoDVector.y).toEqual(3);
+    });
+  });
+
+  describe("subVectors", () => {
+    it("should be able to subtract a vector to the vector", () => {
+      twoDVector.subVectors(new TwoDVector(2,3));
+      expect(twoDVector.x).toEqual(8);
+      expect(twoDVector.y).toEqual(3);
+    });
+  });
 });
