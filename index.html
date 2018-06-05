@@ -3,13 +3,52 @@
   <head>
     <meta charset="utf-8">
     <title>Kd-Visualizer</title>
+    <link rel="shortcut icon" type="image/png" href="jk.png"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
     <script type="text/javascript" src="scripts/bundle.js"></script>
   </head>
   <body>
     <h1>kd-tree Visualizer</h1>
+    <p>
+     <strong>Kd-tree</strong><br />
+     We know many ways to search a one dimensional range to find inclusive points and nearest neighbors. This problem gets a bit harder when trying to visualize in two or more dimensions as a regular binary search tree or array will not suffice. Creating a K-d tree is great way of efficiently searching for k-dimensional ranges without the need for extra data structures.<br />
+
+    <strong>Creating the tree</strong><br />
+
+    For each level of the tree the data will be split according by dimension.<br />
+    e.g. You have a 3-dimensional dataset, depth 0 will be sorted on x, depth 1 will be split on y, and depth 2 will be split on z. You will then repeat this for larger dimensions.<br />
+    The median value of that dimension is picked as a pivot node and inserted into the tree.<br />
+    All smaller values will be sent left to the left child and all larger values will be sent to the right child
+    This process continues until all nodes have been inserted into the tree.<br />
+
+    <strong>Range Search</strong><br />
+
+    You can do a range search in O(log n) time by utilizing an inorder traversal through the kd-tree and pruning non-optimal subtrees.<br />
+
+
+    <strong>K-Nearest Neighbors</strong><br />
+
+    knn can also be implemented in O(log n) time by pruning sub-trees that have parents further then the largest node in the nearest neighbor list.
+    </p>
+
     <canvas id="treeCanvas" width="600" height="600"></canvas>
     <canvas id="2DCanvas" width="620" height="620"></canvas>
+    <p>
+    <strong>240-boids Simulation</strong><br />
+
+    This simulation uses the k-nearest neighbor search to mimic flock behavior. The bird-oids (boids) follow three main rules:
+    <br />
+    1. boids move towards the center of mass of the k-nearest boids<br />
+    2. boids match velocity of the k-nearest boids<br />
+    3. boids avoid collisions with all other boids<br />
+    <br />
+    Since I need the boids to stay on the screen so you can view the visualization I have three more rules:
+    <br />
+    4. boids try to stay within the bounding box of the canvas<br />
+    5. boids will have a slight leaning towards your cursor
+    to add an interactive aspect<br />
+    6. each boids velocity is capped to prevent them from going off the screen<br />
+    </p>
     <canvas id="boidCanvas" width="1400" height="1400"></canvas>
   </body>
 </html>
