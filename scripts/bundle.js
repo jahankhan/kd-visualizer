@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tree = new _kd_tree__WEBPACK_IMPORTED_MODULE_0__["default"](null, 2);
   tree.buildOptimalTree(twodPointList);
-  console.log(tree.getPoints(tree.root));
+  // console.log(tree.getPoints(tree.root));
   const treeVis = new _tree_vis__WEBPACK_IMPORTED_MODULE_2__["default"](tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new _two_d_vis__WEBPACK_IMPORTED_MODULE_3__["default"](tree);

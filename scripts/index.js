@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tree = new KDTree(null, 2);
   tree.buildOptimalTree(twodPointList);
-  console.log(tree.getPoints(tree.root));
+  // console.log(tree.getPoints(tree.root));
   const treeVis = new TreeVis(tree);
   treeVis.drawTree(tree.root);
   const twoDVis = new TwoDVis(tree);
