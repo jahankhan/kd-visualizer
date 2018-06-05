@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     [7,5],
     [12,7],
   ];
-  // console.log(pointList);
 
   const tree = new KDTree(null, 2);
   tree.buildOptimalTree(twodPointList);
@@ -39,19 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
   treeVis.drawTree(tree.root);
   const twoDVis = new TwoDVis(tree);
   twoDVis.drawVis(tree.root);
-  // setScene();
-  // console.
-  // console.log(tree.rangeSearch(tree.root, [[1, 4], [1, 6]]));
-  // console.log(tree.kNearestNeigbors([2,5], tree.root, new MaxHeap(), 10));
-  // console.log(tree.kNearestNeigbors([2,7], tree.root, new MaxHeap(), 10));
-  // const heap = new MaxHeap();
-  // heap.insert(1);
-  // heap.insert(5);
-  // heap.insert(3);
-  // heap.insert(9);
-  // heap.insert(11);
-  // heap.insert(7);
-  // heap.insert(2);
   const boidTree = new KDTree(null, 2);
   const boids = boidTree.createBoids(240);
   boidTree.buildOptimalTree(boids);

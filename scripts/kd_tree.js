@@ -180,7 +180,7 @@ class KDTree {
   }
 
   centerOfMass(node) {
-    const nodes = this.getPoints(this.root);=
+    const nodes = this.getPoints(this.root);
     let cOfMass = null;
     for(let i = 0; i < nodes.length; i++) {
       if(node.data !== nodes[i].data) {
